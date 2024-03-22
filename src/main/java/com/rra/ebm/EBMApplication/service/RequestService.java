@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class RequestService {
     @Value("${upload.path}")
     private String uploadPath;
-    private RequestRepo requestRepo;
+    private final RequestRepo requestRepo;
 
     @Autowired
     public RequestService(RequestRepo requestRepo) {
@@ -27,28 +28,26 @@ public class RequestService {
     }
 
     public void saveRequest(Requests requests, MultipartFile letter, MultipartFile certifcate,
-                            MultipartFile vatCertificate, MultipartFile idCard){
-        Requests req=requestRepo.save(requests);
+                            MultipartFile vatCertificate, MultipartFile idCard) throws IOException {
+        String letterPath=saveFile(letter);
+        String certPath=saveFile(certifcate);
+        String vathPath=saveFile(vatCertificate);
+        String idPath=saveFile(idCard);
+        Requests req=new Requests();
 
         try{
-            if(letter!=null){
-                String letterPath=saveFile(letter);
-                req.setLetterPath(letterPath);
+            req.setTinNumber(requests.getTinNumber());
+            req.setSerialNumber(requests.getSerialNumber());
+            req.setOwner(requests.getOwner());
+            req.setEbmType(requests.getEbmType());
+            req.setStatus(requests.getStatus());
+            req.setRequestDate(new Date());
+            req.setLetterPath(letterPath);
+            req.setCertPath(certPath);
+            req.setVatPath(vathPath);
+            req.setIdPath(idPath);
+            requestRepo.save(req);
 
-            }
-            if(certifcate!=null){
-                String certPath=saveFile(certifcate);
-                req.setCertPath(certPath);
-            }
-            if(vatCertificate!=null){
-                String vathPath=saveFile(vatCertificate);
-                req.setVatPath(vathPath);
-
-            }
-            if(idCard!=null){
-                String idPath=saveFile(idCard);
-                req.setIdPath(idPath);
-            }
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -58,14 +57,13 @@ public class RequestService {
     }
     private String saveFile(MultipartFile file) throws IOException {
         String fileName= UUID.randomUUID().toString()+""+file.getOriginalFilename();
-        Path imagesDirectory= Paths.get(uploadPath);
-        if(!Files.exists(imagesDirectory)){
-            Files.createDirectories(imagesDirectory);
+        Path filesDirectory= Paths.get(uploadPath);
+        if(!Files.exists(filesDirectory)){
+            Files.createDirectories(filesDirectory);
         }
-        Path filePath=imagesDirectory.resolve(fileName);
+        Path filePath=filesDirectory.resolve(fileName);
         Files.copy(file.getInputStream(),filePath);
         return fileName;
-
     }
 
     public List<Requests>allRequests(){

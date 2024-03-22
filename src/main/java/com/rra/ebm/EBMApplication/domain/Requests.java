@@ -1,8 +1,13 @@
 package com.rra.ebm.EBMApplication.domain;
 
-import java.util.Date;
+import jakarta.persistence.*;
 
+import java.util.Date;
+@Entity
+@Table
 public class Requests {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int tinNumber;
     private String serialNumber;

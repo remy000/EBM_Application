@@ -37,7 +37,7 @@ public class SecurityConfig {
         return  http.csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/taxPayer/**","/users/register","/users/authentication").permitAll()
-                .requestMatchers("/users/changePassword").authenticated()
+                .requestMatchers("/users/changePassword", "/applications/**").authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
