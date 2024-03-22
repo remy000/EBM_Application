@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/applications")
@@ -55,6 +56,37 @@ public class RequestController {
         }
         catch (Exception ex){
             return  new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+
+        }
+    }
+    @GetMapping(value = "/allApplications")
+    @PreAuthorize("hasAuthority('admin')")
+
+    public ResponseEntity<?>allRequests(){
+        try {
+            List<Requests> allRequests = requestService.allRequests();
+            return new ResponseEntity<>(allRequests,HttpStatus.OK);
+        }
+        catch (Exception ex){
+            return  new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+
+    }
+    @GetMapping(value = "/findApplication/{tin}")
+    @PreAuthorize("hasAuthority('taxpayer')")
+    public ResponseEntity<?>findRequest(@PathVariable("tin") int tin){
+        try {
+            Requests req=requestService.findByTin(tin);
+            if(req!=null){
+                return  new ResponseEntity<>(req,HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("No requests",HttpStatus.BAD_REQUEST);
+
+            }
+        }
+        catch (Exception ex){
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
     }
