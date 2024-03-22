@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -66,4 +67,37 @@ public class RequestService {
         return fileName;
 
     }
+
+    public List<Requests>allRequests(){
+        return requestRepo.findAll();
+    }
+
+    public Requests findRequest(int id){
+        return requestRepo.findById(id).orElse(null);
+    }
+    public Requests findByTin(int tin){
+        return requestRepo.findByTinNumber(tin).orElse(null);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
