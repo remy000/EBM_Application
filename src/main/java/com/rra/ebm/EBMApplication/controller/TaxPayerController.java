@@ -19,9 +19,15 @@ public class TaxPayerController {
     @PostMapping(value = "/savePayer")
     public ResponseEntity<?>saveTaxPayer(@RequestBody TaxPayer taxPayer){
         if(taxPayer!=null){
+            TaxPayer payer=taxPayerService.findTaxPayer(taxPayer.getTin());
+            if(payer==null) {
 
                 taxPayerService.saveTaxPayer(taxPayer);
                 return new ResponseEntity<>("tax Payer Saved", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("taxPayer already exist",HttpStatus.BAD_REQUEST);
+            }
 
 
         }

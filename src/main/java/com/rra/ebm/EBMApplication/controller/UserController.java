@@ -58,20 +58,26 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?>SignUp(@RequestBody Users users){
         if(users!=null){
-            String defaultPassword=generateDefaultPassword();
-            users.setPassword(encoder.encode(defaultPassword));
-            users.setDefault(true);
-            users.setChangedAt(new Date());
-            String subject="Account Created";
-            String text= "Thank you for Signing up, your password is "+defaultPassword;
+            Users usr=usersService.findUser(users.getTin());
+            if(usr==null) {
+                String defaultPassword = generateDefaultPassword();
+                users.setPassword(encoder.encode(defaultPassword));
+                users.setDefault(true);
+                users.setChangedAt(new Date());
+                String subject = "Account Created";
+                String text = "Thank you for Signing up, your password is " + defaultPassword;
 
-            String userEmail = users.getEmail();
-            if (userEmail != null) {
-                emailService.sendingEmails(userEmail, subject,text);
-                usersService.saveUser(users);
-                return new ResponseEntity<>("User saved and email sent", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("User email is null", HttpStatus.BAD_GATEWAY);
+                String userEmail = users.getEmail();
+                if (userEmail != null) {
+                    emailService.sendingEmails(userEmail, subject, text);
+                    usersService.saveUser(users);
+                    return new ResponseEntity<>("User saved and email sent", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>("User email is null", HttpStatus.BAD_GATEWAY);
+                }
+            }else {
+                return new ResponseEntity<>("User already Exist",HttpStatus.CONFLICT);
+
             }
 
         }

@@ -47,9 +47,9 @@ public class RequestController {
                     "we will review it and we will be back to you shortly";
             String email = user.getEmail();
             requestService.saveRequest(requests,letter,certificate,vatCertificate,idCard);
-            if(email != null){
+
                 emailService.sendingEmails(email,subject,text);
-            }
+
             return new ResponseEntity<>("application saved", HttpStatus.OK);
 
 
