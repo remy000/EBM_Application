@@ -2,6 +2,7 @@ package com.rra.ebm.EBMApplication.domain;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 @Entity
 @Table
@@ -14,7 +15,7 @@ public class Requests {
     private String owner;
     private String ebmType;
     private String status;
-    private Date requestDate;
+    private LocalDate requestDate;
     private String letterPath;
     private String certPath;
     private String vatPath;
@@ -23,7 +24,7 @@ public class Requests {
     public Requests() {
     }
 
-    public Requests(int id, int tinNumber, String serialNumber, String owner, String ebmType, String status, Date requestDate, String letterPath, String certPath, String vatPath, String idPath) {
+    public Requests(int id, int tinNumber, String serialNumber, String owner, String ebmType, String status, LocalDate requestDate, String letterPath, String certPath, String vatPath, String idPath) {
         this.id = id;
         this.tinNumber = tinNumber;
         this.serialNumber = serialNumber;
@@ -85,11 +86,11 @@ public class Requests {
         this.status = status;
     }
 
-    public Date getRequestDate() {
+    public LocalDate getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
+    public void setRequestDate(LocalDate requestDate) {
         this.requestDate = requestDate;
     }
 

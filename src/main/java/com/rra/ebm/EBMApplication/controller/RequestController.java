@@ -43,8 +43,8 @@ public class RequestController {
             int tin=requests.getTinNumber();
             Users user=usersService.findUser(tin);
             String subject="Application Received";
-            String text= "Thank you for applying to get EBM, your application has been received " +
-                    "we will review it and we will be back to you shortly";
+            String text= "Thank you for applying to get EBM Software, your application has been received " +
+                    "we will review it and we will be back to you";
             String email = user.getEmail();
             requestService.saveRequest(requests,letter,certificate,vatCertificate,idCard);
 
@@ -78,6 +78,14 @@ public class RequestController {
         try {
             Requests req=requestService.findByTin(tin);
             if(req!=null){
+                String letterPath="http://localhost:8080/files" + req.getLetterPath();
+                String certificatePath="http://localhost:8080/files"+req.getCertPath();
+                String vatPath="http://localhost:8080/files"+req.getVatPath();
+                String idPath="http://localhost:8080/files"+req.getIdPath();
+                req.setLetterPath(letterPath);
+                req.setCertPath(certificatePath);
+                req.setVatPath(vatPath);
+                req.setIdPath(idPath);
                 return  new ResponseEntity<>(req,HttpStatus.OK);
             }
             else{

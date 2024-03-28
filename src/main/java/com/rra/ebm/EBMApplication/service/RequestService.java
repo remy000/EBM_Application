@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class RequestService {
             req.setOwner(requests.getOwner());
             req.setEbmType(requests.getEbmType());
             req.setStatus(requests.getStatus());
-            req.setRequestDate(new Date());
+            req.setRequestDate(LocalDate.now());
             req.setLetterPath(letterPath);
             req.setCertPath(certPath);
             req.setVatPath(vathPath);
