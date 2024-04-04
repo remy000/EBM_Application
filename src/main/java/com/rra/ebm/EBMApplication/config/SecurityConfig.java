@@ -35,6 +35,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
         return  http.csrf().disable()
+                .headers().frameOptions().disable().and()
                 .authorizeHttpRequests()
                 .requestMatchers("/taxPayer/**","/users/register","/users/authentication","/files/**").permitAll()
                 .requestMatchers("/users/changePassword", "/applications/**").authenticated()
@@ -44,6 +45,8 @@ public class SecurityConfig {
                 .and()
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+
+
 
     }
     @Bean

@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/applications")
@@ -61,7 +62,6 @@ public class RequestController {
     }
     @GetMapping(value = "/allApplications")
     @PreAuthorize("hasAuthority('admin')")
-
     public ResponseEntity<?>allRequests(){
         try {
             List<Requests> allRequests = requestService.allRequests();
@@ -73,23 +73,23 @@ public class RequestController {
 
     }
     @GetMapping(value = "/findApplication/{tin}")
-    @PreAuthorize("hasAuthority('taxpayer')")
+    @PreAuthorize("hasAnyAuthority('admin','taxpayer')")
     public ResponseEntity<?>findRequest(@PathVariable("tin") int tin){
         try {
             Requests req=requestService.findByTin(tin);
             if(req!=null){
-                String letterPath="http://localhost:8080/files" + req.getLetterPath();
-                String certificatePath="http://localhost:8080/files"+req.getCertPath();
-                String vatPath="http://localhost:8080/files"+req.getVatPath();
-                String idPath="http://localhost:8080/files"+req.getIdPath();
-                req.setLetterPath(letterPath);
+               String letterPath="http://localhost:8080/files/" + req.getLetterPath();
+                String certificatePath="http://localhost:8080/files/"+req.getCertPath();
+                String vatPath="http://localhost:8080/files/"+req.getVatPath();
+                String idPath="http://localhost:8080/files/"+req.getIdPath();
+               req.setLetterPath(letterPath);
                 req.setCertPath(certificatePath);
                 req.setVatPath(vatPath);
                 req.setIdPath(idPath);
                 return  new ResponseEntity<>(req,HttpStatus.OK);
             }
             else{
-                return new ResponseEntity<>("No requests",HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("No requests",HttpStatus.NOT_FOUND);
 
             }
         }
@@ -98,4 +98,45 @@ public class RequestController {
 
         }
     }
+    @PostMapping(value = "/approve/{tin}")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?>confirmRequest(@PathVariable int tin,  @RequestBody Map<String, String> requestBody){
+        Users users=usersService.findUser(tin);
+        String feedback = requestBody.get("feedback");
+        if(users!=null){
+            Requests req=requestService.findByTin(tin);
+            String email=users.getEmail();
+            String subject="Application Approved";
+            if(req!=null){
+                req.setStatus("approved");
+                requestService.updateRequest(tin,"approved");
+                emailService.sendingEmails(email,subject,feedback);
+                return new ResponseEntity<>("application approved",HttpStatus.OK);
+
+            }
+        }
+        return new ResponseEntity<>("User is null", HttpStatus.NOT_FOUND);
+
+    }
+
+    @PostMapping(value = "/reject")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?>rejectRequest(@RequestParam int tin, @RequestParam String feedback){
+        Users users=usersService.findUser(tin);
+        if(users!=null){
+            Requests req=requestService.findByTin(tin);
+            String email=users.getEmail();
+            String subject="Application Approved";
+            if(req!=null){
+                req.setStatus("approved");
+                requestService.updateRequest(tin,"rejected");
+                emailService.sendingEmails(email,subject,feedback);
+                return new ResponseEntity<>("application rejected",HttpStatus.OK);
+
+            }
+        }
+        return new ResponseEntity<>("User is null", HttpStatus.NOT_FOUND);
+
+    }
+
 }
