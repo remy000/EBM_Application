@@ -88,6 +88,15 @@ public class RequestService {
 
         }
     }
+
+    public boolean deleteRequest(int tin){
+        Requests req=requestRepo.findByTinNumber(tin).orElse(null);
+        if(req!=null){
+            requestRepo.delete(req);
+            return true;
+        }
+        return false;
+    }
 }
 
 

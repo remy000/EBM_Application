@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.HandlerTypePredicate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -106,7 +107,7 @@ public class RequestController {
         if(users!=null){
             Requests req=requestService.findByTin(tin);
             String email=users.getEmail();
-            String subject="Application Approved";
+            String subject="Application Status";
             if(req!=null){
                 req.setStatus("approved");
                 requestService.updateRequest(tin,"approved");
@@ -119,16 +120,17 @@ public class RequestController {
 
     }
 
-    @PostMapping(value = "/reject")
+    @PostMapping(value = "/reject/{tin}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?>rejectRequest(@RequestParam int tin, @RequestParam String feedback){
+    public ResponseEntity<?>rejectRequest(@PathVariable int tin,  @RequestBody Map<String, String> requestBody){
         Users users=usersService.findUser(tin);
+        String feedback = requestBody.get("feedback");
         if(users!=null){
             Requests req=requestService.findByTin(tin);
             String email=users.getEmail();
-            String subject="Application Approved";
+            String subject="Application Status";
             if(req!=null){
-                req.setStatus("approved");
+                req.setStatus("rejected");
                 requestService.updateRequest(tin,"rejected");
                 emailService.sendingEmails(email,subject,feedback);
                 return new ResponseEntity<>("application rejected",HttpStatus.OK);
@@ -137,6 +139,18 @@ public class RequestController {
         }
         return new ResponseEntity<>("User is null", HttpStatus.NOT_FOUND);
 
+    }
+    @DeleteMapping(value = "/delete/{tin}")
+    public ResponseEntity<?>deleteRequest(@PathVariable int tin){
+        Requests requests=requestService.findByTin(tin);
+        if(requests!=null){
+            requestService.deleteRequest(requests.getTinNumber());
+            return new ResponseEntity<>("Request Deleted",HttpStatus.OK);
+
+        }
+        else{
+            return new ResponseEntity<>("Request doesn't exist", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
