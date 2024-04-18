@@ -4,17 +4,15 @@ import com.rra.ebm.EBMApplication.domain.Requests;
 import com.rra.ebm.EBMApplication.repository.RequestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.RemoteException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,10 +21,12 @@ public class RequestService {
     @Value("${upload.path}")
     private String uploadPath;
     private final RequestRepo requestRepo;
+    private final EmailService emailService;
 
     @Autowired
-    public RequestService(RequestRepo requestRepo) {
+    public RequestService(RequestRepo requestRepo, EmailService emailService) {
         this.requestRepo = requestRepo;
+        this.emailService = emailService;
     }
 
     public void saveRequest(Requests requests, MultipartFile letter, MultipartFile certifcate,
@@ -96,6 +96,20 @@ public class RequestService {
             return true;
         }
         return false;
+    }
+    @Scheduled(fixedRate = 5000)
+    public void sentReminder(){
+        List<Requests>pendingRequests=requestRepo.findByStatus("pending");
+        for(Requests req:pendingRequests){
+             String adminEmail = "dukundaneremy2001@gmail.com"; // Replace with actual admin email
+             String subject = "Reminder: Pending Application";
+              String text = "This is a reminder that the application with TIN number "
+              + req.getTinNumber() + " is pending approval.";
+              emailService.sendingEmails(adminEmail,subject,text);
+    }
+
+
+
     }
 }
 
