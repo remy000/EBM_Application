@@ -97,7 +97,7 @@ public class RequestService {
         }
         return false;
     }
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 24*60*60*1000)
     public void sentReminder(){
         List<Requests>pendingRequests=requestRepo.findByStatus("pending");
         for(Requests req:pendingRequests){
